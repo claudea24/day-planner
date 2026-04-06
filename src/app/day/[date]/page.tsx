@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { use } from "react";
-import { useEventsForDate } from "@/context/EventContext";
+import {
+  useEventsForDate,
+  useTasksForDate,
+} from "@/context/PlannerContext";
 import { formatDate, getAdjacentDate } from "@/lib/utils";
-import DayTimeline from "@/components/DayTimeline";
+import ScheduleTimeline from "@/components/ScheduleTimeline";
+import DayTaskList from "@/components/DayTaskList";
 
 export default function DayPage({
   params,
@@ -13,6 +17,7 @@ export default function DayPage({
 }) {
   const { date } = use(params);
   const events = useEventsForDate(date);
+  const tasks = useTasksForDate(date);
   const prevDate = getAdjacentDate(date, -1);
   const nextDate = getAdjacentDate(date, 1);
 
@@ -28,7 +33,7 @@ export default function DayPage({
           href="/"
           className="mt-4 inline-block text-sm font-medium text-blue-600 hover:text-blue-700"
         >
-          &larr; Back to today
+          &larr; Back to inbox
         </Link>
       </div>
     );
@@ -85,11 +90,50 @@ export default function DayPage({
           href={`/add?date=${date}`}
           className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
-          + Add Event
+          + Add Item
         </Link>
       </div>
 
-      <DayTimeline events={events} />
+      <div className="flex flex-col gap-8">
+        <section>
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-slate-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Schedule
+          </h2>
+          <ScheduleTimeline events={events} />
+        </section>
+
+        <section>
+          <h2 className="mb-3 flex items-center gap-2 text-lg font-semibold text-slate-900">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 text-slate-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+              <path
+                fillRule="evenodd"
+                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Tasks
+          </h2>
+          <DayTaskList tasks={tasks} />
+        </section>
+      </div>
     </div>
   );
 }
