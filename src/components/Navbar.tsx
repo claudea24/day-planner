@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { href: "/", label: "Today" },
+  { href: "/", label: "Inbox" },
   { href: "/week", label: "Week" },
 ];
 
@@ -42,7 +42,7 @@ export default function Navbar() {
             href="/add"
             className="ml-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
-            + Add Event
+            + Add Item
           </Link>
         </div>
       </div>
