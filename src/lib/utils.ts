@@ -1,4 +1,4 @@
-import { PlannerEvent } from "./types";
+import { Task, ScheduleEvent } from "./types";
 
 export function getTodayString(): string {
   return new Date().toISOString().split("T")[0];
@@ -20,6 +20,15 @@ export function formatDate(dateStr: string): string {
   });
 }
 
+export function formatDateShort(dateStr: string): string {
+  const date = new Date(dateStr + "T00:00:00");
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export function formatTime(time: string): string {
   const [h, m] = time.split(":");
   const hour = parseInt(h);
@@ -36,14 +45,21 @@ export function getWeekDates(referenceDate?: string): string[] {
   const monday = new Date(ref);
   monday.setDate(ref.getDate() - ((day + 6) % 7));
 
-  return Array.from({ length: 7 }, (_, i) => {
+  return Array.from({ length: 5 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     return d.toISOString().split("T")[0];
   });
 }
 
-export function getCategoryColor(category: PlannerEvent["category"]): string {
+export function getDayLabel(dateStr: string): string {
+  const date = new Date(dateStr + "T00:00:00");
+  return date.toLocaleDateString("en-US", { weekday: "short" });
+}
+
+export function getCategoryColor(
+  category: "work" | "personal" | "health" | "other"
+): string {
   const colors = {
     work: "bg-blue-100 text-blue-800 border-blue-200",
     personal: "bg-purple-100 text-purple-800 border-purple-200",
@@ -53,7 +69,9 @@ export function getCategoryColor(category: PlannerEvent["category"]): string {
   return colors[category];
 }
 
-export function getCategoryDot(category: PlannerEvent["category"]): string {
+export function getCategoryDot(
+  category: "work" | "personal" | "health" | "other"
+): string {
   const colors = {
     work: "bg-blue-500",
     personal: "bg-purple-500",
@@ -63,31 +81,103 @@ export function getCategoryDot(category: PlannerEvent["category"]): string {
   return colors[category];
 }
 
-const today = getTodayString();
-const tomorrow = getAdjacentDate(today, 1);
-const yesterday = getAdjacentDate(today, -1);
+export function getPriorityColor(priority: "P0" | "P1" | "P2"): string {
+  const colors = {
+    P0: "bg-red-100 text-red-800 border-red-200",
+    P1: "bg-amber-100 text-amber-800 border-amber-200",
+    P2: "bg-slate-100 text-slate-600 border-slate-200",
+  };
+  return colors[priority];
+}
 
-export const seedEvents: PlannerEvent[] = [
+export function getPriorityDot(priority: "P0" | "P1" | "P2"): string {
+  const colors = {
+    P0: "bg-red-500",
+    P1: "bg-amber-500",
+    P2: "bg-slate-400",
+  };
+  return colors[priority];
+}
+
+export function cyclePriority(
+  current: "P0" | "P1" | "P2"
+): "P0" | "P1" | "P2" {
+  const order: ("P0" | "P1" | "P2")[] = ["P0", "P1", "P2"];
+  return order[(order.indexOf(current) + 1) % 3];
+}
+
+const today = getTodayString();
+const weekDates = getWeekDates(today);
+
+export const seedTasks: Task[] = [
   {
-    id: "seed-1",
-    title: "Morning Run",
-    date: today,
-    startTime: "07:00",
-    endTime: "08:00",
-    category: "health",
-    description: "5K jog around the park",
+    id: "task-1",
+    type: "task",
+    title: "Ship auth API endpoint",
+    priority: "P0",
+    category: "work",
+    assignedDate: weekDates[0],
+    description: "Finish the /auth/login and /auth/refresh endpoints",
+    completed: false,
   },
   {
-    id: "seed-2",
+    id: "task-2",
+    type: "task",
+    title: "Fix dashboard loading bug",
+    priority: "P0",
+    category: "work",
+    assignedDate: weekDates[1],
+    completed: false,
+  },
+  {
+    id: "task-3",
+    type: "task",
+    title: "Write blog post",
+    priority: "P1",
+    category: "personal",
+    description: "Draft the post about weekend hiking trip",
+    completed: false,
+  },
+  {
+    id: "task-4",
+    type: "task",
+    title: "Book dentist appointment",
+    priority: "P1",
+    category: "health",
+    completed: false,
+  },
+  {
+    id: "task-5",
+    type: "task",
+    title: "Update project README",
+    priority: "P2",
+    category: "work",
+    completed: false,
+  },
+  {
+    id: "task-6",
+    type: "task",
+    title: "Organize photo library",
+    priority: "P2",
+    category: "personal",
+    completed: false,
+  },
+];
+
+export const seedEvents: ScheduleEvent[] = [
+  {
+    id: "event-1",
+    type: "event",
     title: "Team Standup",
     date: today,
     startTime: "09:30",
     endTime: "10:00",
     category: "work",
-    description: "Daily sync with engineering team",
+    notes: "Discuss sprint progress, blockers on auth API, and review deployment timeline for next week.",
   },
   {
-    id: "seed-3",
+    id: "event-2",
+    type: "event",
     title: "Lunch with Alex",
     date: today,
     startTime: "12:00",
@@ -95,21 +185,22 @@ export const seedEvents: PlannerEvent[] = [
     category: "personal",
   },
   {
-    id: "seed-4",
+    id: "event-3",
+    type: "event",
     title: "Project Review",
-    date: tomorrow,
+    date: weekDates[2] || today,
     startTime: "14:00",
     endTime: "15:30",
     category: "work",
-    description: "Q2 milestone review with stakeholders",
+    notes: "Q2 milestone review with stakeholders. Prepare slides covering: auth system progress, performance improvements, and user feedback summary. Key decision: whether to delay mobile launch by 2 weeks.",
   },
   {
-    id: "seed-5",
+    id: "event-4",
+    type: "event",
     title: "Yoga Class",
-    date: yesterday,
+    date: weekDates[3] || today,
     startTime: "18:00",
     endTime: "19:00",
     category: "health",
-    description: "Beginner vinyasa flow",
   },
 ];
