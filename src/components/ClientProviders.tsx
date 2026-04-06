@@ -1,8 +1,8 @@
 "use client";
 
 import { ReactNode } from "react";
-import { EventProvider } from "@/context/EventContext";
+import { PlannerProvider } from "@/context/PlannerContext";
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
-  return <EventProvider>{children}</EventProvider>;
+  return <PlannerProvider>{children}</PlannerProvider>;
 }
