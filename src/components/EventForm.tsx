@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useEvents } from "@/context/EventContext";
-import { PlannerEvent } from "@/lib/types";
+import { usePlanner } from "@/context/PlannerContext";
+import { ScheduleEvent } from "@/lib/types";
 import { getTodayString } from "@/lib/utils";
 
-const categories: PlannerEvent["category"][] = [
+const categories: ScheduleEvent["category"][] = [
   "work",
   "personal",
   "health",
@@ -15,14 +15,14 @@ const categories: PlannerEvent["category"][] = [
 
 export default function EventForm({ defaultDate }: { defaultDate?: string }) {
   const router = useRouter();
-  const { dispatch } = useEvents();
+  const { dispatch } = usePlanner();
 
   const [title, setTitle] = useState("");
   const [date, setDate] = useState(defaultDate || getTodayString());
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
-  const [category, setCategory] = useState<PlannerEvent["category"]>("work");
-  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState<ScheduleEvent["category"]>("work");
+  const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
@@ -38,14 +38,15 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
       return;
     }
 
-    const event: PlannerEvent = {
+    const event: ScheduleEvent = {
       id: crypto.randomUUID(),
+      type: "event",
       title: title.trim(),
       date,
       startTime,
       endTime,
       category,
-      description: description.trim() || undefined,
+      notes: notes.trim() || undefined,
     };
 
     dispatch({ type: "ADD_EVENT", payload: event });
@@ -61,14 +62,11 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
       )}
 
       <div>
-        <label
-          htmlFor="title"
-          className="mb-1.5 block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor="event-title" className="mb-1.5 block text-sm font-medium text-slate-700">
           Event Title
         </label>
         <input
-          id="title"
+          id="event-title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -78,14 +76,11 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
       </div>
 
       <div>
-        <label
-          htmlFor="date"
-          className="mb-1.5 block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor="event-date" className="mb-1.5 block text-sm font-medium text-slate-700">
           Date
         </label>
         <input
-          id="date"
+          id="event-date"
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
@@ -95,14 +90,11 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label
-            htmlFor="startTime"
-            className="mb-1.5 block text-sm font-medium text-slate-700"
-          >
+          <label htmlFor="event-start" className="mb-1.5 block text-sm font-medium text-slate-700">
             Start Time
           </label>
           <input
-            id="startTime"
+            id="event-start"
             type="time"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
@@ -110,14 +102,11 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
           />
         </div>
         <div>
-          <label
-            htmlFor="endTime"
-            className="mb-1.5 block text-sm font-medium text-slate-700"
-          >
+          <label htmlFor="event-end" className="mb-1.5 block text-sm font-medium text-slate-700">
             End Time
           </label>
           <input
-            id="endTime"
+            id="event-end"
             type="time"
             value={endTime}
             onChange={(e) => setEndTime(e.target.value)}
@@ -127,17 +116,14 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
       </div>
 
       <div>
-        <label
-          htmlFor="category"
-          className="mb-1.5 block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor="event-category" className="mb-1.5 block text-sm font-medium text-slate-700">
           Category
         </label>
         <select
-          id="category"
+          id="event-category"
           value={category}
           onChange={(e) =>
-            setCategory(e.target.value as PlannerEvent["category"])
+            setCategory(e.target.value as ScheduleEvent["category"])
           }
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         >
@@ -150,19 +136,15 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
       </div>
 
       <div>
-        <label
-          htmlFor="description"
-          className="mb-1.5 block text-sm font-medium text-slate-700"
-        >
-          Description{" "}
-          <span className="font-normal text-slate-400">(optional)</span>
+        <label htmlFor="event-notes" className="mb-1.5 block text-sm font-medium text-slate-700">
+          Notes <span className="font-normal text-slate-400">(optional)</span>
         </label>
         <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={3}
-          placeholder="Add details about this event..."
+          id="event-notes"
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          rows={4}
+          placeholder="Meeting agenda, preparation notes, talking points..."
           className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
