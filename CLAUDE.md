@@ -165,6 +165,24 @@ e2e/
 └── add-event.spec.ts           # Playwright e2e tests (5 tests)
 ```
 
+## Style & Design Preferences
+
+- **Google Calendar-style** for day and week views — full-screen hourly grid, events positioned by time, click empty slot to create
+- **Notion-style** for todo list — inline add/edit, type and press Enter to keep adding, drag between sections
+- **Larger fonts** — base font size 20px, all sizes use rem so they scale together. No fixed px font sizes
+- **Events pop to front** when expanded (z-index 50) so they're always editable, never hidden behind other events
+- **Back-to-back events** must not visually overlap — use gap/offset between consecutive events
+- **Close (X) vs Delete (trash)** — always visually distinct icons so users don't accidentally delete when trying to close
+- **No duplicate buttons** — only one "+ Add Item" in the navbar, not repeated on page toolbars
+- **Week always starts Monday** (Mon–Sun), regardless of what day it is today
+- **Calendar columns must stay aligned** — use CSS grid with shared `grid-template-columns` for header and body
+- **No AI features** unless user has their own API key configured — removed AI polish to keep the app self-contained
+- **Scrollable time grids** — both day and week views scroll vertically within the viewport, sticky day headers
+- **Per-week todo lists** — tasks belong to a specific week, can navigate between weeks, can copy incomplete tasks from previous week
+- **All task priorities assignable to days** — not just P0, any priority can be placed on a specific day
+- **Single click to expand/collapse** events — no double-click issues, parent controls expand state when needed
+- **Tasks editable everywhere** — checkboxes on weekly and daily views, inline edit on todo list
+
 ## Security Rules
 
 - Never read, display, or log the contents of `.env`, `.env.*`, or any file likely containing secrets.
