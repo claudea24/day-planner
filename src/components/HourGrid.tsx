@@ -77,10 +77,10 @@ export default function HourGrid({
           {HOURS.map((hour) => (
             <div
               key={hour}
-              className="flex items-start justify-end border-b border-slate-50 pr-2 pt-1"
+              className="flex items-start justify-end border-b border-slate-200 pr-2 pt-1"
               style={{ height: HOUR_HEIGHT }}
             >
-              <span className="text-xs text-slate-400">
+              <span className="text-sm text-slate-500">
                 {formatTime(`${hour.toString().padStart(2, "0")}:00`)}
               </span>
             </div>
@@ -97,7 +97,7 @@ export default function HourGrid({
           {HOURS.map((hour) => (
             <div
               key={hour}
-              className="absolute left-0 right-0 border-b border-slate-50"
+              className="absolute left-0 right-0 border-b border-slate-200"
               style={{ top: (hour - START_HOUR) * HOUR_HEIGHT + HOUR_HEIGHT }}
             />
           ))}
@@ -120,8 +120,8 @@ export default function HourGrid({
               <div
                 key={event.id}
                 data-event-block
-                className="absolute left-1 right-2"
-                style={{ top, height, minHeight: 28, zIndex: 10 }}
+                className="absolute left-2 right-3"
+                style={{ top, height, minHeight: 32, zIndex: 10 }}
               >
                 <EventBlock event={event} />
               </div>

@@ -101,7 +101,7 @@ export default function EventBlock({
         if (onClose && expanded) return;
         setExpanded(!expanded);
       }}
-      className={`cursor-pointer rounded-lg border-l-4 px-3 py-2 shadow-sm transition-colors ${categoryBorder[event.category]} ${categoryBg[event.category]}`}
+      className={`cursor-pointer rounded-lg border-l-4 px-4 py-3 shadow-md transition-all hover:shadow-lg ${expanded ? "shadow-xl ring-1 ring-slate-200" : ""} ${categoryBorder[event.category]} ${categoryBg[event.category]}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
@@ -121,11 +121,11 @@ export default function EventBlock({
                 }}
                 onClick={(e) => e.stopPropagation()}
                 autoFocus
-                className="w-full border-none bg-transparent text-sm font-semibold text-slate-900 outline-none"
+                className="w-full border-none bg-transparent text-base font-semibold text-slate-900 outline-none"
               />
             ) : (
               <span
-                className="truncate text-sm font-semibold text-slate-900"
+                className="truncate text-base font-semibold text-slate-900"
                 onClick={(e) => {
                   if (expanded) { e.stopPropagation(); setEditingTitle(true); }
                 }}
@@ -169,13 +169,14 @@ export default function EventBlock({
             </div>
           ) : (
             <p
-              className="ml-4 text-xs text-slate-500 hover:text-blue-600"
+              className="ml-4 text-sm text-slate-500 hover:text-blue-600"
               onClick={(e) => {
                 if (expanded) { e.stopPropagation(); setEditingTime(true); }
               }}
             >
               {formatTime(event.startTime)} – {formatTime(event.endTime)}
             </p>
+
           )}
 
           {/* Location — shown when expanded or when set */}
