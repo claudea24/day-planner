@@ -76,12 +76,6 @@ export default function DayPage({
             {formatDate(date)}
           </span>
         </div>
-        <Link
-          href={`/add?date=${date}`}
-          className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          + Add Item
-        </Link>
       </div>
 
       {/* Tasks strip at top */}
