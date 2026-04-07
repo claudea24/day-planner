@@ -21,6 +21,7 @@ export default function PrioritySection({
 }) {
   const { dispatch } = usePlanner();
   const [newTitle, setNewTitle] = useState("");
+  const [dragOver, setDragOver] = useState(false);
 
   function addTask() {
     const trimmed = newTitle.trim();
@@ -40,6 +41,28 @@ export default function PrioritySection({
     setNewTitle("");
   }
 
+  function handleDragOver(e: React.DragEvent) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setDragOver(true);
+  }
+
+  function handleDragLeave() {
+    setDragOver(false);
+  }
+
+  function handleDrop(e: React.DragEvent) {
+    e.preventDefault();
+    setDragOver(false);
+    const taskId = e.dataTransfer.getData("text/plain");
+    if (taskId) {
+      dispatch({
+        type: "UPDATE_TASK",
+        payload: { id: taskId, priority },
+      });
+    }
+  }
+
   return (
     <div>
       <div className="mb-2 flex items-center gap-2 px-3">
@@ -54,10 +77,26 @@ export default function PrioritySection({
         <span className="text-xs text-slate-400">({tasks.length})</span>
       </div>
 
-      <div className="rounded-lg border border-slate-200 bg-white">
+      <div
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        className={`rounded-lg border bg-white transition-colors ${
+          dragOver
+            ? "border-blue-400 bg-blue-50/50 shadow-inner"
+            : "border-slate-200"
+        }`}
+      >
         {tasks.map((task) => (
           <TaskCard key={task.id} task={task} />
         ))}
+
+        {/* Drop hint when empty and dragging over */}
+        {tasks.length === 0 && dragOver && (
+          <div className="px-3 py-4 text-center text-sm text-blue-500">
+            Drop here to set as {priority}
+          </div>
+        )}
 
         {/* Notion-style add row */}
         <div className="flex items-center gap-2 px-3 py-2">

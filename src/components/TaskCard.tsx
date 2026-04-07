@@ -40,11 +40,20 @@ export default function TaskCard({ task }: { task: Task }) {
 
   return (
     <div
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/plain", task.id);
+        e.dataTransfer.effectAllowed = "move";
+        (e.currentTarget as HTMLElement).style.opacity = "0.4";
+      }}
+      onDragEnd={(e) => {
+        (e.currentTarget as HTMLElement).style.opacity = "";
+      }}
       className={`group flex items-center gap-2 border-b border-slate-100 px-3 py-2 transition-colors hover:bg-slate-50 ${
         task.completed ? "opacity-50" : ""
       }`}
     >
-      {/* Drag handle (visual) */}
+      {/* Drag handle */}
       <div className="flex w-4 cursor-grab flex-col items-center gap-0.5 opacity-0 group-hover:opacity-40">
         <div className="flex gap-0.5">
           <div className="h-1 w-1 rounded-full bg-slate-400" />
