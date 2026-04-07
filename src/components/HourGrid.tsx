@@ -2,6 +2,7 @@
 
 import { ScheduleEvent } from "@/lib/types";
 import { formatTime } from "@/lib/utils";
+import { usePlanner } from "@/context/PlannerContext";
 import EventBlock from "./EventBlock";
 
 const START_HOUR = 6;
@@ -36,7 +37,37 @@ export default function HourGrid({
   events: ScheduleEvent[];
   date?: string;
 }) {
+  const { dispatch } = usePlanner();
   const totalHeight = HOURS.length * HOUR_HEIGHT;
+
+  function handleGridClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (!date) return;
+    // Only create if clicking empty space (not on an event)
+    if ((e.target as HTMLElement).closest("[data-event-block]")) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top + e.currentTarget.scrollTop;
+    const minutes = Math.floor((y / HOUR_HEIGHT) * 60) + START_HOUR * 60;
+    const hour = Math.floor(minutes / 60);
+    const min = Math.round((minutes % 60) / 15) * 15;
+    const startTime = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+    const endHour = min + 60 >= 60 ? hour + 1 : hour;
+    const endMin = (min + 60) % 60;
+    const endTime = `${endHour.toString().padStart(2, "0")}:${endMin.toString().padStart(2, "0")}`;
+
+    dispatch({
+      type: "ADD_EVENT",
+      payload: {
+        id: crypto.randomUUID(),
+        type: "event",
+        title: "New Event",
+        date,
+        startTime,
+        endTime,
+        category: "work",
+      },
+    });
+  }
 
   return (
     <div className="h-full overflow-y-auto bg-white">
@@ -56,8 +87,12 @@ export default function HourGrid({
           ))}
         </div>
 
-        {/* Events area */}
-        <div className="relative flex-1" style={{ height: totalHeight }}>
+        {/* Events area — click empty space to create */}
+        <div
+          className="relative flex-1 cursor-crosshair"
+          style={{ height: totalHeight }}
+          onClick={handleGridClick}
+        >
           {/* Hour lines */}
           {HOURS.map((hour) => (
             <div
@@ -78,12 +113,13 @@ export default function HourGrid({
             />
           ))}
 
-          {/* Event blocks — clickable to expand */}
+          {/* Event blocks */}
           {events.map((event) => {
             const { top, height } = getEventPosition(event);
             return (
               <div
                 key={event.id}
+                data-event-block
                 className="absolute left-1 right-2"
                 style={{ top, height, minHeight: 28, zIndex: 10 }}
               >
@@ -91,24 +127,6 @@ export default function HourGrid({
               </div>
             );
           })}
-
-          {/* Empty state */}
-          {events.length === 0 && (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-sm text-slate-300">
-                {date ? (
-                  <a
-                    href={`/add?tab=event&date=${date}`}
-                    className="hover:text-blue-400"
-                  >
-                    Click + Add Event to schedule something
-                  </a>
-                ) : (
-                  "No events"
-                )}
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>

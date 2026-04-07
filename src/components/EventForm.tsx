@@ -22,6 +22,7 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [category, setCategory] = useState<ScheduleEvent["category"]>("work");
+  const [location, setLocation] = useState("");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
 
@@ -46,6 +47,7 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
       startTime,
       endTime,
       category,
+      location: location.trim() || undefined,
       notes: notes.trim() || undefined,
     };
 
@@ -113,6 +115,20 @@ export default function EventForm({ defaultDate }: { defaultDate?: string }) {
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="event-location" className="mb-1.5 block text-sm font-medium text-slate-700">
+          Location <span className="font-normal text-slate-400">(optional)</span>
+        </label>
+        <input
+          id="event-location"
+          type="text"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          placeholder="Office, Zoom, Coffee shop..."
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        />
       </div>
 
       <div>

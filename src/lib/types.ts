@@ -20,6 +20,7 @@ export interface ScheduleEvent {
   startTime: string; // "HH:mm"
   endTime: string; // "HH:mm"
   category: "work" | "personal" | "health" | "other";
+  location?: string;
   notes?: string;
   notesSummary?: string; // AI-generated summary
 }

@@ -137,14 +137,44 @@ function DayColumn({
   isToday: boolean;
   totalHeight: number;
 }) {
+  const { dispatch } = usePlanner();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  function handleColumnClick(e: React.MouseEvent<HTMLDivElement>) {
+    if ((e.target as HTMLElement).closest("[data-event-block]")) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const minutes = Math.floor((y / HOUR_HEIGHT) * 60) + START_HOUR * 60;
+    const hour = Math.floor(minutes / 60);
+    const min = Math.round((minutes % 60) / 15) * 15;
+    const startTime = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+    const endHour = hour + 1;
+    const endTime = `${endHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
+
+    const newId = crypto.randomUUID();
+    dispatch({
+      type: "ADD_EVENT",
+      payload: {
+        id: newId,
+        type: "event",
+        title: "New Event",
+        date,
+        startTime,
+        endTime,
+        category: "work",
+      },
+    });
+    setExpandedId(newId);
+  }
 
   return (
     <div
-      className={`relative flex-1 border-l border-slate-100 ${
+      className={`relative flex-1 border-l border-slate-100 cursor-crosshair ${
         isToday ? "bg-blue-50/20" : ""
       }`}
       style={{ height: totalHeight }}
+      onClick={handleColumnClick}
     >
       {/* Hour lines */}
       {HOURS.map((hour) => (
@@ -175,6 +205,7 @@ function DayColumn({
         return (
           <div
             key={event.id}
+            data-event-block
             className="absolute left-0.5 right-0.5"
             style={{
               top,
