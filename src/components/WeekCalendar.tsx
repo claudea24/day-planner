@@ -36,11 +36,16 @@ export default function WeekCalendar({
   // All tasks for this week
   const weekTasks = tasks.filter((t) => t.week === monday);
 
+  const gridCols = `4rem repeat(7, minmax(0, 1fr))`;
+
   return (
     <div className="h-full overflow-y-auto border-t border-slate-200 bg-white">
       {/* Sticky day headers with tasks */}
-      <div className="sticky top-0 z-20 flex border-b border-slate-200 bg-white">
-        <div className="w-16 flex-shrink-0 border-r border-slate-100" />
+      <div
+        className="sticky top-0 z-20 grid border-b border-slate-200 bg-white"
+        style={{ gridTemplateColumns: gridCols }}
+      >
+        <div className="border-r border-slate-100" />
         {weekDates.map((date) => {
           const isToday = date === today;
           const dayNum = new Date(date + "T00:00:00").getDate();
@@ -51,7 +56,7 @@ export default function WeekCalendar({
           return (
             <div
               key={date}
-              className={`flex-1 border-l border-slate-100 px-1 py-2 ${
+              className={`min-w-0 border-l border-slate-100 px-1 py-2 ${
                 isToday ? "bg-blue-50/50" : ""
               }`}
             >
@@ -86,9 +91,12 @@ export default function WeekCalendar({
       </div>
 
       {/* Time grid */}
-      <div className="flex">
+      <div
+        className="grid"
+        style={{ gridTemplateColumns: gridCols }}
+      >
         {/* Time labels */}
-        <div className="w-16 flex-shrink-0 border-r border-slate-100">
+        <div className="border-r border-slate-100">
           {HOURS.map((hour) => (
             <div
               key={hour}
@@ -168,7 +176,7 @@ function DayColumn({
 
   return (
     <div
-      className={`relative flex-1 border-l border-slate-100 cursor-crosshair ${
+      className={`relative min-w-0 border-l border-slate-100 cursor-crosshair ${
         isToday ? "bg-blue-50/20" : ""
       }`}
       style={{ height: totalHeight }}
