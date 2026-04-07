@@ -59,11 +59,11 @@ export default function WeekCalendar({
                 href={`/day/${date}`}
                 className="flex flex-col items-center gap-0.5 hover:opacity-80"
               >
-                <span className="text-[10px] font-medium uppercase text-slate-400">
+                <span className="text-xs font-medium uppercase text-slate-400">
                   {getDayLabel(date)}
                 </span>
                 <span
-                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
                     isToday
                       ? "bg-blue-600 text-white"
                       : "text-slate-700"
@@ -96,7 +96,7 @@ export default function WeekCalendar({
                 className="flex items-start justify-end pr-2 pt-0.5"
                 style={{ height: HOUR_HEIGHT }}
               >
-                <span className="text-[10px] text-slate-400">
+                <span className="text-xs text-slate-400">
                   {formatTime(`${hour.toString().padStart(2, "0")}:00`)}
                 </span>
               </div>
@@ -242,7 +242,7 @@ function TaskCheckbox({
 }) {
   return (
     <label
-      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[10px] cursor-pointer transition-colors hover:bg-slate-100 ${
+      className={`flex items-center gap-1 rounded px-1 py-0.5 text-xs cursor-pointer transition-colors hover:bg-slate-100 ${
         task.completed ? "opacity-50" : ""
       }`}
     >
@@ -267,7 +267,7 @@ function TaskCheckbox({
         {task.title}
       </span>
       <span
-        className={`ml-auto flex-shrink-0 rounded px-1 text-[8px] font-bold ${getPriorityColor(task.priority)}`}
+        className={`ml-auto flex-shrink-0 rounded px-1 text-[0.6rem] font-bold ${getPriorityColor(task.priority)}`}
       >
         {task.priority}
       </span>
@@ -294,10 +294,10 @@ function CompactEvent({
   return (
     <button
       onClick={onClick}
-      className={`h-full w-full cursor-pointer overflow-hidden truncate rounded border-l-2 px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors ${categoryStyles[event.category]}`}
+      className={`h-full w-full cursor-pointer overflow-hidden truncate rounded border-l-2 px-1.5 py-0.5 text-left text-xs font-medium transition-colors ${categoryStyles[event.category]}`}
     >
       {height > 30 && (
-        <span className="block text-[9px] font-normal opacity-70">
+        <span className="block text-[0.65rem] font-normal opacity-70">
           {formatTime(event.startTime)}
         </span>
       )}
