@@ -31,7 +31,9 @@ export default function EventBlock({
   onExpand?: () => void;
 }) {
   const { dispatch } = usePlanner();
-  const [expanded, setExpanded] = useState(onClose ? true : false);
+  const parentControlled = !!(onClose || onExpand);
+  const [internalExpanded, setInternalExpanded] = useState(false);
+  const expanded = parentControlled ? !!onClose : internalExpanded;
   const [editingNotes, setEditingNotes] = useState(false);
   const [notes, setNotes] = useState(event.notes || "");
 
@@ -100,9 +102,12 @@ export default function EventBlock({
   return (
     <div
       onClick={() => {
-        if (onClose && expanded) return;
-        if (!expanded && onExpand) onExpand();
-        setExpanded(!expanded);
+        if (parentControlled) {
+          if (expanded && onClose) onClose();
+          else if (!expanded && onExpand) onExpand();
+        } else {
+          setInternalExpanded(!internalExpanded);
+        }
       }}
       className={`cursor-pointer rounded-lg border-l-4 px-4 py-3 shadow-md transition-all hover:shadow-lg ${expanded ? "shadow-xl ring-1 ring-slate-200" : ""} ${categoryBorder[event.category]} ${categoryBg[event.category]}`}
     >
@@ -227,7 +232,7 @@ export default function EventBlock({
               onClick={(e) => {
                 e.stopPropagation();
                 if (onClose) onClose();
-                else setExpanded(false);
+                else setInternalExpanded(false);
               }}
               className="rounded p-0.5 text-slate-400 hover:bg-slate-200 hover:text-slate-600"
               aria-label="Close"
