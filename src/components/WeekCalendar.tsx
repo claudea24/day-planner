@@ -37,9 +37,9 @@ export default function WeekCalendar({
   const weekTasks = tasks.filter((t) => t.week === monday);
 
   return (
-    <div className="flex h-full flex-col border-t border-slate-200 bg-white">
+    <div className="h-full overflow-y-auto border-t border-slate-200 bg-white">
       {/* Sticky day headers with tasks */}
-      <div className="flex border-b border-slate-200 bg-white">
+      <div className="sticky top-0 z-20 flex border-b border-slate-200 bg-white">
         <div className="w-16 flex-shrink-0 border-r border-slate-100" />
         {weekDates.map((date) => {
           const isToday = date === today;
@@ -85,42 +85,40 @@ export default function WeekCalendar({
         })}
       </div>
 
-      {/* Scrollable time grid */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="flex">
-          {/* Time labels */}
-          <div className="w-16 flex-shrink-0 border-r border-slate-100">
-            {HOURS.map((hour) => (
-              <div
-                key={hour}
-                className="flex items-start justify-end pr-2 pt-0.5"
-                style={{ height: HOUR_HEIGHT }}
-              >
-                <span className="text-xs text-slate-400">
-                  {formatTime(`${hour.toString().padStart(2, "0")}:00`)}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Day columns */}
-          {weekDates.map((date) => {
-            const dayEvents = events
-              .filter((e) => e.date === date)
-              .sort((a, b) => a.startTime.localeCompare(b.startTime));
-            const isToday = date === today;
-
-            return (
-              <DayColumn
-                key={date}
-                date={date}
-                dayEvents={dayEvents}
-                isToday={isToday}
-                totalHeight={totalHeight}
-              />
-            );
-          })}
+      {/* Time grid */}
+      <div className="flex">
+        {/* Time labels */}
+        <div className="w-16 flex-shrink-0 border-r border-slate-100">
+          {HOURS.map((hour) => (
+            <div
+              key={hour}
+              className="flex items-start justify-end pr-2 pt-0.5"
+              style={{ height: HOUR_HEIGHT }}
+            >
+              <span className="text-xs text-slate-400">
+                {formatTime(`${hour.toString().padStart(2, "0")}:00`)}
+              </span>
+            </div>
+          ))}
         </div>
+
+        {/* Day columns */}
+        {weekDates.map((date) => {
+          const dayEvents = events
+            .filter((e) => e.date === date)
+            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+          const isToday = date === today;
+
+          return (
+            <DayColumn
+              key={date}
+              date={date}
+              dayEvents={dayEvents}
+              isToday={isToday}
+              totalHeight={totalHeight}
+            />
+          );
+        })}
       </div>
     </div>
   );
