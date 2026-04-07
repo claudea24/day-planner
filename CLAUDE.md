@@ -44,7 +44,6 @@ Things that happen at a specific time — meetings, calls, appointments. Each ha
 - **React Context + useReducer** for client-side state (in-memory)
 - **HTML5 Drag and Drop** for task reordering between priorities
 - **Playwright** for end-to-end testing
-- **Claude API** (Haiku) for AI-powered note polishing
 
 ## Getting Started
 
@@ -136,12 +135,6 @@ State is managed via React Context + useReducer. Data lives in memory — refres
 - Task form: title, priority selector (P0/P1/P2), category, optional day, description
 - Event form: title, date, start/end time, location, category, notes
 
-### Polish with AI
-- While editing notes, click **"Polish with AI"** to get a cleaned-up version
-- AI improves grammar, clarity, and organization while keeping the same meaning
-- A preview appears with **"Replace with polished"** or **"Keep original"** buttons
-- Uses `/api/summarize` endpoint calling Claude Haiku
-
 ## Shared Layout
 
 All pages share a root layout (`layout.tsx`) with:
@@ -160,7 +153,6 @@ src/
 │   ├── day/[date]/page.tsx     # Day View (hourly calendar)
 │   ├── add/page.tsx            # Add Item (tabbed form)
 │   ├── week/page.tsx           # Week View (weekly calendar)
-│   └── api/summarize/route.ts  # AI summarize endpoint
 ├── components/
 │   ├── Navbar.tsx              # Top navigation bar
 │   ├── ClientProviders.tsx     # Client-side context wrapper
