@@ -4,19 +4,6 @@ A weekly planning tool that combines **prioritized tasks** and **scheduled event
 
 **GitHub**: https://github.com/claudea24/day-planner
 
-## Project Requirements
-
-- [x] At least 4 distinct pages / routes — `/`, `/day/[date]`, `/add`, `/week`
-- [x] A form that adds data — `/add` with tabbed form (Task or Event), client-side state in memory
-- [x] A dynamic route — `/day/[date]` for per-day views
-- [x] A shared layout with navigation — persistent top Navbar with links to all pages, active route highlighting
-- [x] Styled with Tailwind — polished, presentable UI
-- [x] A CLAUDE.md that describes project, pages, and data model — this file
-- [x] Playwright MCP configured — 5 e2e tests verifying interactions
-- [ ] Deployed to Vercel with a live URL — *(URL TBD after deployment)*
-- [x] Code pushed to a public GitHub repo — https://github.com/claudea24/day-planner
-- [x] Multiple git commits showing iteration process — 40+ commits
-
 ## Core Concept
 
 There are two types of items:
