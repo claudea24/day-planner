@@ -126,9 +126,8 @@ export default function HourGrid({
                 data-event-block
                 className="absolute left-2 right-3"
                 style={{
-                  top,
-                  height: isExpanded ? "auto" : height,
-                  minHeight: height,
+                  top: top + 1,
+                  height: isExpanded ? "auto" : Math.max(height - 2, 28),
                   zIndex: isExpanded ? 50 : 10,
                 }}
               >

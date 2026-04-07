@@ -109,7 +109,7 @@ export default function EventBlock({
           setInternalExpanded(!internalExpanded);
         }
       }}
-      className={`cursor-pointer rounded-lg border-l-4 px-4 py-3 shadow-md transition-all hover:shadow-lg ${expanded ? "shadow-xl ring-1 ring-slate-200" : ""} ${categoryBorder[event.category]} ${categoryBg[event.category]}`}
+      className={`cursor-pointer overflow-hidden rounded-lg border-l-4 transition-all ${expanded ? "px-4 py-3 shadow-xl ring-1 ring-slate-200" : "px-3 py-1 shadow-sm hover:shadow-md"} ${categoryBorder[event.category]} ${categoryBg[event.category]}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
