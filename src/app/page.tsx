@@ -13,8 +13,17 @@ import {
   getWeekDates,
 } from "@/lib/utils";
 import PrioritySection from "@/components/PrioritySection";
+import ClientOnly from "@/components/ClientOnly";
 
 export default function Home() {
+  return (
+    <ClientOnly>
+      <HomeContent />
+    </ClientOnly>
+  );
+}
+
+function HomeContent() {
   const [weekStart, setWeekStart] = useState(() => getMondayOfWeek());
   const { P0, P1, P2 } = useTasksByPriorityForWeek(weekStart);
   const { tasks, dispatch } = usePlanner();

@@ -10,8 +10,17 @@ import {
   getPriorityColor,
 } from "@/lib/utils";
 import WeekCalendar from "@/components/WeekCalendar";
+import ClientOnly from "@/components/ClientOnly";
 
 export default function WeekPage() {
+  return (
+    <ClientOnly>
+      <WeekContent />
+    </ClientOnly>
+  );
+}
+
+function WeekContent() {
   const { tasks } = usePlanner();
   const [weekStart, setWeekStart] = useState<string | undefined>(undefined);
 
