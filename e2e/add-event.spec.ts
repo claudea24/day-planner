@@ -1,19 +1,17 @@
 import { test, expect } from "@playwright/test";
 
-test("user can add a task and see it in the weekly inbox", async ({ page }) => {
-  await page.goto("/add");
+test("user can add a task inline in the inbox", async ({ page }) => {
+  await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Add Item" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Weekly Inbox" })
+  ).toBeVisible();
 
-  // Should default to Task tab
-  await page.getByLabel("Task Title").fill("Review pull request");
-  await page.getByText("P0Must do").click();
-  await page.getByLabel("Category").selectOption("work");
+  // Use the inline "Add a task..." input in the P0 section
+  const addInput = page.getByPlaceholder("Add a task...").first();
+  await addInput.fill("Review pull request");
+  await addInput.press("Enter");
 
-  await page.getByRole("button", { name: "Create Task" }).click();
-
-  // Should redirect to inbox
-  await expect(page).toHaveURL("/");
   await expect(page.getByText("Review pull request")).toBeVisible();
 });
 
@@ -55,14 +53,22 @@ test("weekly inbox shows tasks grouped by priority", async ({ page }) => {
   await expect(page.getByText("Write blog post")).toBeVisible();
 });
 
-test("day view shows both schedule and tasks sections", async ({ page }) => {
-  // Navigate to today via the inbox
-  await page.goto("/");
-
-  // Click "Day View" or navigate directly
+test("day view shows hourly grid and tasks section", async ({ page }) => {
   const today = new Date().toISOString().split("T")[0];
   await page.goto(`/day/${today}`);
 
+  // Should show Schedule and Tasks sections
   await expect(page.getByText("Schedule")).toBeVisible();
-  await expect(page.getByText("Tasks")).toBeVisible();
+
+  // Should show hourly time labels
+  await expect(page.getByText("9:30 AM")).toBeVisible();
+});
+
+test("week view shows calendar grid", async ({ page }) => {
+  await page.goto("/week");
+
+  await expect(page.getByRole("heading", { name: "Week" })).toBeVisible();
+
+  // Should show the time grid with hour labels
+  await expect(page.getByText("9:00 AM")).toBeVisible();
 });
