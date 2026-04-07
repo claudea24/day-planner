@@ -13,7 +13,7 @@ import { usePlanner } from "@/context/PlannerContext";
 
 export default function TaskCard({ task }: { task: Task }) {
   const { dispatch } = usePlanner();
-  const weekDates = getWeekDates();
+  const weekDates = getWeekDates(task.week);
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(task.title);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -109,8 +109,7 @@ export default function TaskCard({ task }: { task: Task }) {
       </div>
 
       <div className="flex flex-shrink-0 items-center gap-1.5">
-        {task.priority === "P0" && (
-          <select
+        <select
             value={task.assignedDate || ""}
             onChange={(e) =>
               dispatch({
@@ -130,7 +129,6 @@ export default function TaskCard({ task }: { task: Task }) {
               </option>
             ))}
           </select>
-        )}
 
         <span
           className={`rounded-full border px-2 py-0.5 text-xs font-medium ${getCategoryColor(task.category)}`}
