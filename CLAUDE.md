@@ -15,7 +15,7 @@ A weekly planning tool that combines **prioritized tasks** and **scheduled event
 - [x] Playwright MCP configured — 5 e2e tests verifying interactions
 - [ ] Deployed to Vercel with a live URL — *(URL TBD after deployment)*
 - [x] Code pushed to a public GitHub repo — https://github.com/claudea24/day-planner
-- [x] Multiple git commits showing iteration process — 30+ commits
+- [x] Multiple git commits showing iteration process — 40+ commits
 
 ## Core Concept
 
@@ -30,7 +30,7 @@ Things you need to get done. No fixed time — you decide **what priority** and 
 Tasks belong to a specific week. All priorities can be assigned to specific days. Tasks can be dragged between priority sections. Incomplete tasks from a previous week can be copied to the current week.
 
 ### Schedule Events (time-based)
-Things that happen at a specific time — meetings, calls, appointments. Each has a **date**, **start/end time**, optional **location**, and optional **notes**. Notes can be summarized using AI.
+Things that happen at a specific time — meetings, calls, appointments. Each has a **date**, **start/end time**, optional **location**, and optional **notes**.
 
 ### The Combined Views
 - **Day View**: full-screen Google Calendar-style hourly grid with tasks pinned at the top
@@ -118,15 +118,17 @@ State is managed via React Context + useReducer. Data lives in memory — refres
 
 ### Day View (`/day/[date]`)
 - **Click empty time slot** to create a new event at that time (snaps to 15-min intervals)
-- **Click event to expand** — edit title, time, location, notes inline
-- **Close (X)** collapses the expanded view; **Delete (trash)** removes the event
+- **Click event to expand** — edit title, time, location, notes inline; expanded event pops to front (z-index 50)
+- **Close (X)** collapses the expanded view; **Delete (trash icon)** removes the event — visually distinct to prevent accidental deletion
 - **Task checkboxes** at the top to mark tasks complete
+- **Back-to-back events** don't overlap — 2px gap between consecutive events
 - **Prev/next day** navigation + Today button
 
 ### Week View (`/week`)
 - **Click empty time slot** in any day column to create a new event (auto-expands for editing)
-- **Click event to expand** — edit inline with close/delete buttons
+- **Click event to expand** — edit inline with close (X) / delete (trash) buttons
 - **Task checkboxes** under each day header with priority badges
+- **CSS grid layout** — header and body columns stay perfectly aligned at any window size
 - **Prev/next week** navigation + Today button
 - **Unassigned P0 banner** when tasks need day placement
 
@@ -142,6 +144,8 @@ All pages share a root layout (`layout.tsx`) with:
 - Active route is visually highlighted using `usePathname()`
 - `PlannerProvider` wraps all pages so tasks and events are accessible everywhere
 - Calendar views (Day, Week) are full-screen; Todo List and Add Item are centered with max-width
+- Date-dependent pages use `ClientOnly` wrapper to prevent hydration mismatches
+- Base font size is 20px for readability; all sizes use rem units to scale proportionally
 
 ## Project Structure
 
@@ -155,6 +159,7 @@ src/
 │   ├── week/page.tsx           # Week View (weekly calendar)
 ├── components/
 │   ├── Navbar.tsx              # Top navigation bar
+│   ├── ClientOnly.tsx          # Prevents SSR for date-dependent pages
 │   ├── ClientProviders.tsx     # Client-side context wrapper
 │   ├── PrioritySection.tsx     # P0/P1/P2 section with drag-drop
 │   ├── TaskCard.tsx            # Inline editable task row
