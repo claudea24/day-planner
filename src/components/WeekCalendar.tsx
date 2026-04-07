@@ -7,99 +7,110 @@ import {
   getTodayString,
   getDayLabel,
   formatTime,
-  getCategoryDot,
 } from "@/lib/utils";
-import EventBlock from "./EventBlock";
 
-const START_HOUR = 7;
-const END_HOUR = 21;
+const START_HOUR = 6;
+const END_HOUR = 22;
 const HOUR_HEIGHT = 48;
 const HOURS = Array.from(
   { length: END_HOUR - START_HOUR },
   (_, i) => START_HOUR + i
 );
 
-export default function WeekCalendar() {
+const categoryBorder: Record<string, string> = {
+  work: "border-l-blue-500 bg-blue-50 text-blue-800",
+  personal: "border-l-purple-500 bg-purple-50 text-purple-800",
+  health: "border-l-green-500 bg-green-50 text-green-800",
+  other: "border-l-gray-500 bg-gray-50 text-gray-800",
+};
+
+export default function WeekCalendar({
+  weekStart,
+}: {
+  weekStart?: string;
+}) {
   const { tasks, events } = usePlanner();
-  const weekDates = getWeekDates();
+  const weekDates = getWeekDates(weekStart);
   const today = getTodayString();
   const totalHeight = HOURS.length * HOUR_HEIGHT;
 
   return (
-    <div className="overflow-x-auto">
-      <div className="min-w-[800px]">
-        {/* Day headers */}
-        <div className="flex border-b border-slate-200">
-          <div className="w-16 flex-shrink-0" />
-          {weekDates.map((date) => {
-            const isToday = date === today;
-            const dayNum = new Date(date + "T00:00:00").getDate();
-            const dayTasks = tasks.filter(
-              (t) => t.assignedDate === date && t.priority === "P0"
-            );
+    <div className="flex flex-col rounded-lg border border-slate-200 bg-white">
+      {/* Sticky day headers */}
+      <div className="sticky top-0 z-20 flex border-b border-slate-200 bg-white">
+        <div className="w-14 flex-shrink-0 border-r border-slate-100" />
+        {weekDates.map((date) => {
+          const isToday = date === today;
+          const dayNum = new Date(date + "T00:00:00").getDate();
+          const dayTasks = tasks.filter(
+            (t) => t.assignedDate === date && t.priority === "P0"
+          );
 
-            return (
-              <div
-                key={date}
-                className="flex-1 border-l border-slate-100 px-1 pb-2 pt-2"
+          return (
+            <div
+              key={date}
+              className={`flex-1 border-l border-slate-100 px-1 py-2 ${
+                isToday ? "bg-blue-50/50" : ""
+              }`}
+            >
+              <Link
+                href={`/day/${date}`}
+                className="flex flex-col items-center gap-0.5 hover:opacity-80"
               >
-                <Link
-                  href={`/day/${date}`}
-                  className="flex flex-col items-center gap-0.5 hover:opacity-80"
+                <span className="text-[10px] font-medium uppercase text-slate-400">
+                  {getDayLabel(date)}
+                </span>
+                <span
+                  className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                    isToday
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-700"
+                  }`}
                 >
-                  <span className="text-xs font-medium uppercase text-slate-400">
-                    {getDayLabel(date)}
-                  </span>
-                  <span
-                    className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
-                      isToday
-                        ? "bg-blue-600 text-white"
-                        : "text-slate-700"
-                    }`}
-                  >
-                    {dayNum}
-                  </span>
-                </Link>
+                  {dayNum}
+                </span>
+              </Link>
 
-                {/* Compact task list under header */}
-                {dayTasks.length > 0 && (
-                  <div className="mt-1 flex flex-col gap-0.5 px-0.5">
-                    {dayTasks.slice(0, 2).map((task) => (
-                      <div
-                        key={task.id}
-                        className={`flex items-center gap-1 rounded px-1 py-0.5 text-xs ${
-                          task.completed
-                            ? "text-slate-400 line-through"
-                            : "bg-red-50 text-red-700"
-                        }`}
-                      >
-                        <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-500" />
-                        <span className="truncate">{task.title}</span>
-                      </div>
-                    ))}
-                    {dayTasks.length > 2 && (
-                      <span className="px-1 text-xs text-slate-400">
-                        +{dayTasks.length - 2} more
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+              {dayTasks.length > 0 && (
+                <div className="mt-1 flex flex-col gap-0.5 px-0.5">
+                  {dayTasks.slice(0, 2).map((task) => (
+                    <Link
+                      key={task.id}
+                      href={`/day/${date}`}
+                      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[10px] hover:opacity-80 ${
+                        task.completed
+                          ? "text-slate-400 line-through"
+                          : "bg-red-50 text-red-700"
+                      }`}
+                    >
+                      <div className="h-1 w-1 flex-shrink-0 rounded-full bg-red-500" />
+                      <span className="truncate">{task.title}</span>
+                    </Link>
+                  ))}
+                  {dayTasks.length > 2 && (
+                    <span className="px-1 text-[10px] text-slate-400">
+                      +{dayTasks.length - 2}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-        {/* Time grid */}
+      {/* Scrollable time grid */}
+      <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
         <div className="flex">
           {/* Time labels */}
-          <div className="w-16 flex-shrink-0">
+          <div className="w-14 flex-shrink-0 border-r border-slate-100">
             {HOURS.map((hour) => (
               <div
                 key={hour}
                 className="flex items-start justify-end pr-2 pt-0.5"
                 style={{ height: HOUR_HEIGHT }}
               >
-                <span className="text-xs text-slate-400">
+                <span className="text-[10px] text-slate-400">
                   {formatTime(`${hour.toString().padStart(2, "0")}:00`)}
                 </span>
               </div>
@@ -116,8 +127,8 @@ export default function WeekCalendar() {
             return (
               <div
                 key={date}
-                className={`relative flex-1 border-l ${
-                  isToday ? "bg-blue-50/30" : ""
+                className={`relative flex-1 border-l border-slate-100 ${
+                  isToday ? "bg-blue-50/20" : ""
                 }`}
                 style={{ height: totalHeight }}
               >
@@ -132,7 +143,7 @@ export default function WeekCalendar() {
                   />
                 ))}
 
-                {/* Events */}
+                {/* Events — clickable to day view */}
                 {dayEvents.map((event) => {
                   const [startH, startM] = event.startTime
                     .split(":")
@@ -142,21 +153,22 @@ export default function WeekCalendar() {
                   const endMin = endH * 60 + endM;
                   const gridStart = START_HOUR * 60;
 
-                  const top =
-                    ((startMin - gridStart) / 60) * HOUR_HEIGHT;
+                  const top = ((startMin - gridStart) / 60) * HOUR_HEIGHT;
                   const height = Math.max(
                     ((endMin - startMin) / 60) * HOUR_HEIGHT,
-                    22
+                    20
                   );
 
                   return (
-                    <div
+                    <Link
                       key={event.id}
-                      className="absolute left-0.5 right-0.5"
+                      href={`/day/${date}`}
+                      className={`absolute left-0.5 right-0.5 overflow-hidden truncate rounded border-l-2 px-1 py-0.5 text-[10px] font-medium transition-opacity hover:opacity-80 ${categoryBorder[event.category]}`}
                       style={{ top, height, zIndex: 10 }}
+                      title={`${formatTime(event.startTime)} – ${formatTime(event.endTime)}: ${event.title}`}
                     >
-                      <EventBlock event={event} compact />
-                    </div>
+                      {event.title}
+                    </Link>
                   );
                 })}
               </div>

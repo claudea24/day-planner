@@ -45,7 +45,7 @@ export function getWeekDates(referenceDate?: string): string[] {
   const monday = new Date(ref);
   monday.setDate(ref.getDate() - ((day + 6) % 7));
 
-  return Array.from({ length: 5 }, (_, i) => {
+  return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
     return d.toISOString().split("T")[0];
