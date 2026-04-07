@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePlanner } from "@/context/PlannerContext";
+import { Task } from "@/lib/types";
 import {
   getWeekDates,
   getTodayString,
   getDayLabel,
+  getMondayOfWeek,
   formatTime,
+  getPriorityColor,
 } from "@/lib/utils";
 import EventBlock from "./EventBlock";
 
@@ -24,21 +27,25 @@ export default function WeekCalendar({
 }: {
   weekStart?: string;
 }) {
-  const { tasks, events } = usePlanner();
+  const { tasks, events, dispatch } = usePlanner();
   const weekDates = getWeekDates(weekStart);
   const today = getTodayString();
+  const monday = getMondayOfWeek(weekStart);
   const totalHeight = HOURS.length * HOUR_HEIGHT;
+
+  // All tasks for this week
+  const weekTasks = tasks.filter((t) => t.week === monday);
 
   return (
     <div className="flex h-full flex-col border-t border-slate-200 bg-white">
-      {/* Sticky day headers */}
+      {/* Sticky day headers with tasks */}
       <div className="flex border-b border-slate-200 bg-white">
         <div className="w-16 flex-shrink-0 border-r border-slate-100" />
         {weekDates.map((date) => {
           const isToday = date === today;
           const dayNum = new Date(date + "T00:00:00").getDate();
-          const dayTasks = tasks.filter(
-            (t) => t.assignedDate === date && t.priority === "P0"
+          const dayTasks = weekTasks.filter(
+            (t) => t.assignedDate === date
           );
 
           return (
@@ -68,24 +75,9 @@ export default function WeekCalendar({
 
               {dayTasks.length > 0 && (
                 <div className="mt-1 flex flex-col gap-0.5 px-0.5">
-                  {dayTasks.slice(0, 2).map((task) => (
-                    <div
-                      key={task.id}
-                      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[10px] ${
-                        task.completed
-                          ? "text-slate-400 line-through"
-                          : "bg-red-50 text-red-700"
-                      }`}
-                    >
-                      <div className="h-1 w-1 flex-shrink-0 rounded-full bg-red-500" />
-                      <span className="truncate">{task.title}</span>
-                    </div>
+                  {dayTasks.map((task) => (
+                    <TaskCheckbox key={task.id} task={task} dispatch={dispatch} />
                   ))}
-                  {dayTasks.length > 2 && (
-                    <span className="px-1 text-[10px] text-slate-400">
-                      +{dayTasks.length - 2}
-                    </span>
-                  )}
                 </div>
               )}
             </div>
@@ -207,6 +199,48 @@ function DayColumn({
         );
       })}
     </div>
+  );
+}
+
+function TaskCheckbox({
+  task,
+  dispatch,
+}: {
+  task: Task;
+  dispatch: React.Dispatch<import("@/lib/types").PlannerAction>;
+}) {
+  return (
+    <label
+      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[10px] cursor-pointer transition-colors hover:bg-slate-100 ${
+        task.completed ? "opacity-50" : ""
+      }`}
+    >
+      <input
+        type="checkbox"
+        checked={task.completed}
+        onChange={() =>
+          dispatch({
+            type: "UPDATE_TASK",
+            payload: { id: task.id, completed: !task.completed },
+          })
+        }
+        className="h-3 w-3 flex-shrink-0 rounded border-slate-300 text-blue-600 focus:ring-0"
+      />
+      <span
+        className={`truncate ${
+          task.completed
+            ? "text-slate-400 line-through"
+            : "text-slate-700"
+        }`}
+      >
+        {task.title}
+      </span>
+      <span
+        className={`ml-auto flex-shrink-0 rounded px-1 text-[8px] font-bold ${getPriorityColor(task.priority)}`}
+      >
+        {task.priority}
+      </span>
+    </label>
   );
 }
 

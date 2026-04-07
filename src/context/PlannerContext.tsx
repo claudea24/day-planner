@@ -126,7 +126,7 @@ export function useTasksByPriorityForWeek(week: string) {
 export function useTasksForDate(date: string) {
   const { tasks } = usePlanner();
   return useMemo(
-    () => tasks.filter((t) => t.assignedDate === date && t.priority === "P0"),
+    () => tasks.filter((t) => t.assignedDate === date),
     [tasks, date]
   );
 }
