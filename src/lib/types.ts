@@ -5,6 +5,7 @@ export interface Task {
   title: string;
   priority: "P0" | "P1" | "P2";
   category: "work" | "personal" | "health" | "other";
+  week: string; // "YYYY-MM-DD" Monday of the week this task belongs to
   assignedDate?: string; // "YYYY-MM-DD" — set when placed on a day
   description?: string;
   completed: boolean;
@@ -28,7 +29,8 @@ export type PlannerItem = Task | ScheduleEvent;
 export type TaskAction =
   | { type: "ADD_TASK"; payload: Task }
   | { type: "UPDATE_TASK"; payload: Partial<Task> & { id: string } }
-  | { type: "DELETE_TASK"; payload: { id: string } };
+  | { type: "DELETE_TASK"; payload: { id: string } }
+  | { type: "COPY_TASKS_FROM_WEEK"; payload: { fromWeek: string; toWeek: string } };
 
 export type EventAction =
   | { type: "ADD_EVENT"; payload: ScheduleEvent }

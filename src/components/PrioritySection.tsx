@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Task } from "@/lib/types";
 import { getPriorityColor } from "@/lib/utils";
 import { usePlanner } from "@/context/PlannerContext";
@@ -15,13 +15,16 @@ const priorityLabels = {
 export default function PrioritySection({
   priority,
   tasks,
+  week,
 }: {
   priority: "P0" | "P1" | "P2";
   tasks: Task[];
+  week: string;
 }) {
   const { dispatch } = usePlanner();
   const [newTitle, setNewTitle] = useState("");
   const [dragOver, setDragOver] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   function addTask() {
     const trimmed = newTitle.trim();
@@ -35,10 +38,13 @@ export default function PrioritySection({
         title: trimmed,
         priority,
         category: "work",
+        week,
         completed: false,
       },
     });
     setNewTitle("");
+    // Keep focus so user can keep typing more tasks
+    setTimeout(() => inputRef.current?.focus(), 0);
   }
 
   function handleDragOver(e: React.DragEvent) {
@@ -91,22 +97,25 @@ export default function PrioritySection({
           <TaskCard key={task.id} task={task} />
         ))}
 
-        {/* Drop hint when empty and dragging over */}
         {tasks.length === 0 && dragOver && (
           <div className="px-3 py-4 text-center text-sm text-blue-500">
             Drop here to set as {priority}
           </div>
         )}
 
-        {/* Notion-style add row */}
+        {/* Add row — Enter creates task and keeps focus for next one */}
         <div className="flex items-center gap-2 px-3 py-2">
           <div className="w-4" />
           <div className="h-4 w-4" />
           <input
+            ref={inputRef}
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") addTask();
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addTask();
+              }
             }}
             placeholder="Add a task..."
             className="flex-1 border-none bg-transparent py-0 text-sm text-slate-900 placeholder-slate-300 outline-none focus:ring-0"

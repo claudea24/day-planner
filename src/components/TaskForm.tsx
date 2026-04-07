@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePlanner } from "@/context/PlannerContext";
 import { Task } from "@/lib/types";
+import { getMondayOfWeek } from "@/lib/utils";
 
 const categories: Task["category"][] = ["work", "personal", "health", "other"];
 const priorities: Task["priority"][] = ["P0", "P1", "P2"];
@@ -34,6 +35,7 @@ export default function TaskForm({ defaultDate }: { defaultDate?: string }) {
       title: title.trim(),
       priority,
       category,
+      week: getMondayOfWeek(),
       assignedDate: assignedDate || undefined,
       description: description.trim() || undefined,
       completed: false,

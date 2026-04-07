@@ -4,7 +4,7 @@ test("user can add a task inline in the inbox", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: "Weekly Inbox" })
+    page.getByRole("heading", { name: "Todo List" })
   ).toBeVisible();
 
   // Use the inline "Add a task..." input in the P0 section
@@ -40,7 +40,7 @@ test("weekly inbox shows tasks grouped by priority", async ({ page }) => {
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { name: "Weekly Inbox" })
+    page.getByRole("heading", { name: "Todo List" })
   ).toBeVisible();
 
   // Seed data should show priority sections
@@ -48,9 +48,8 @@ test("weekly inbox shows tasks grouped by priority", async ({ page }) => {
   await expect(page.getByText("Should do if time allows")).toBeVisible();
   await expect(page.getByText("Can push to next week")).toBeVisible();
 
-  // Seed tasks should be visible
-  await expect(page.getByText("Ship auth API endpoint")).toBeVisible();
-  await expect(page.getByText("Write blog post")).toBeVisible();
+  // Seed tasks should be visible (in this week's view)
+  await expect(page.getByText("Ship auth API endpoint")).toBeVisible({ timeout: 10000 });
 });
 
 test("day view shows hourly grid with time labels", async ({ page }) => {

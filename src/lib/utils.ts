@@ -37,13 +37,18 @@ export function formatTime(time: string): string {
   return `${display}:${m} ${ampm}`;
 }
 
-export function getWeekDates(referenceDate?: string): string[] {
-  const ref = referenceDate
-    ? new Date(referenceDate + "T00:00:00")
-    : new Date();
+export function getMondayOfWeek(referenceDate?: string): string {
+  const dateStr = referenceDate || getTodayString();
+  const ref = new Date(dateStr + "T00:00:00");
   const day = ref.getDay();
   const monday = new Date(ref);
   monday.setDate(ref.getDate() - ((day + 6) % 7));
+  return monday.toISOString().split("T")[0];
+}
+
+export function getWeekDates(referenceDate?: string): string[] {
+  const mondayStr = getMondayOfWeek(referenceDate);
+  const monday = new Date(mondayStr + "T00:00:00");
 
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
@@ -107,6 +112,7 @@ export function cyclePriority(
 }
 
 const today = getTodayString();
+const currentWeek = getMondayOfWeek(today);
 const weekDates = getWeekDates(today);
 
 export const seedTasks: Task[] = [
@@ -116,6 +122,7 @@ export const seedTasks: Task[] = [
     title: "Ship auth API endpoint",
     priority: "P0",
     category: "work",
+    week: currentWeek,
     assignedDate: weekDates[0],
     description: "Finish the /auth/login and /auth/refresh endpoints",
     completed: false,
@@ -126,6 +133,7 @@ export const seedTasks: Task[] = [
     title: "Fix dashboard loading bug",
     priority: "P0",
     category: "work",
+    week: currentWeek,
     assignedDate: weekDates[1],
     completed: false,
   },
@@ -135,6 +143,7 @@ export const seedTasks: Task[] = [
     title: "Write blog post",
     priority: "P1",
     category: "personal",
+    week: currentWeek,
     description: "Draft the post about weekend hiking trip",
     completed: false,
   },
@@ -144,6 +153,7 @@ export const seedTasks: Task[] = [
     title: "Book dentist appointment",
     priority: "P1",
     category: "health",
+    week: currentWeek,
     completed: false,
   },
   {
@@ -152,6 +162,7 @@ export const seedTasks: Task[] = [
     title: "Update project README",
     priority: "P2",
     category: "work",
+    week: currentWeek,
     completed: false,
   },
   {
@@ -160,6 +171,7 @@ export const seedTasks: Task[] = [
     title: "Organize photo library",
     priority: "P2",
     category: "personal",
+    week: currentWeek,
     completed: false,
   },
 ];

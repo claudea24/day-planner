@@ -9,7 +9,7 @@ export default function Navbar() {
   const today = getTodayString();
 
   const navLinks = [
-    { href: "/", label: "Inbox" },
+    { href: "/", label: "Todo List" },
     { href: `/day/${today}`, label: "Day", match: "/day" },
     { href: "/week", label: "Week" },
   ];

@@ -40,6 +40,18 @@ function plannerReducer(
         ...state,
         tasks: state.tasks.filter((t) => t.id !== action.payload.id),
       };
+    case "COPY_TASKS_FROM_WEEK": {
+      const { fromWeek, toWeek } = action.payload;
+      const sourceTasks = state.tasks.filter((t) => t.week === fromWeek && !t.completed);
+      const newTasks = sourceTasks.map((t) => ({
+        ...t,
+        id: crypto.randomUUID(),
+        week: toWeek,
+        assignedDate: undefined,
+        completed: false,
+      }));
+      return { ...state, tasks: [...state.tasks, ...newTasks] };
+    }
     case "ADD_EVENT":
       return { ...state, events: [...state.events, action.payload] };
     case "UPDATE_EVENT":
@@ -93,6 +105,21 @@ export function useTasksByPriority() {
       P2: tasks.filter((t) => t.priority === "P2"),
     }),
     [tasks]
+  );
+}
+
+export function useTasksByPriorityForWeek(week: string) {
+  const { tasks } = usePlanner();
+  return useMemo(
+    () => {
+      const weekTasks = tasks.filter((t) => t.week === week);
+      return {
+        P0: weekTasks.filter((t) => t.priority === "P0"),
+        P1: weekTasks.filter((t) => t.priority === "P1"),
+        P2: weekTasks.filter((t) => t.priority === "P2"),
+      };
+    },
+    [tasks, week]
   );
 }
 
