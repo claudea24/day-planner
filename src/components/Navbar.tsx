@@ -2,15 +2,20 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 import { getTodayString } from "@/lib/utils";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const today = getTodayString();
+  const [today, setToday] = useState("");
+
+  useEffect(() => {
+    setToday(getTodayString());
+  }, []);
 
   const navLinks = [
     { href: "/", label: "Todo List" },
-    { href: `/day/${today}`, label: "Day", match: "/day" },
+    { href: today ? `/day/${today}` : "/day/2000-01-01", label: "Day", match: "/day" },
     { href: "/week", label: "Week" },
   ];
 

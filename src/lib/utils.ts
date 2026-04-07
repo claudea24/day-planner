@@ -1,13 +1,20 @@
 import { Task, ScheduleEvent } from "./types";
 
+function toLocalDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = (date.getMonth() + 1).toString().padStart(2, "0");
+  const d = date.getDate().toString().padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export function getTodayString(): string {
-  return new Date().toISOString().split("T")[0];
+  return toLocalDateString(new Date());
 }
 
 export function getAdjacentDate(dateStr: string, offset: number): string {
   const date = new Date(dateStr + "T00:00:00");
   date.setDate(date.getDate() + offset);
-  return date.toISOString().split("T")[0];
+  return toLocalDateString(date);
 }
 
 export function formatDate(dateStr: string): string {
@@ -43,7 +50,7 @@ export function getMondayOfWeek(referenceDate?: string): string {
   const day = ref.getDay();
   const monday = new Date(ref);
   monday.setDate(ref.getDate() - ((day + 6) % 7));
-  return monday.toISOString().split("T")[0];
+  return toLocalDateString(monday);
 }
 
 export function getWeekDates(referenceDate?: string): string[] {
@@ -53,7 +60,7 @@ export function getWeekDates(referenceDate?: string): string[] {
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    return d.toISOString().split("T")[0];
+    return toLocalDateString(d);
   });
 }
 
