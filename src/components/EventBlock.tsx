@@ -23,10 +23,12 @@ export default function EventBlock({
   event,
   compact = false,
   onClose,
+  onExpand,
 }: {
   event: ScheduleEvent;
   compact?: boolean;
   onClose?: () => void;
+  onExpand?: () => void;
 }) {
   const { dispatch } = usePlanner();
   const [expanded, setExpanded] = useState(onClose ? true : false);
@@ -99,6 +101,7 @@ export default function EventBlock({
     <div
       onClick={() => {
         if (onClose && expanded) return;
+        if (!expanded && onExpand) onExpand();
         setExpanded(!expanded);
       }}
       className={`cursor-pointer rounded-lg border-l-4 px-4 py-3 shadow-md transition-all hover:shadow-lg ${expanded ? "shadow-xl ring-1 ring-slate-200" : ""} ${categoryBorder[event.category]} ${categoryBg[event.category]}`}

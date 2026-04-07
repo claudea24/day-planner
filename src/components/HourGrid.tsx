@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ScheduleEvent } from "@/lib/types";
 import { formatTime } from "@/lib/utils";
 import { usePlanner } from "@/context/PlannerContext";
@@ -24,7 +25,7 @@ function getEventPosition(event: ScheduleEvent) {
   const top = ((startMinutes - gridStartMinutes) / 60) * HOUR_HEIGHT;
   const height = Math.max(
     ((endMinutes - startMinutes) / 60) * HOUR_HEIGHT,
-    28
+    32
   );
 
   return { top, height };
@@ -38,11 +39,11 @@ export default function HourGrid({
   date?: string;
 }) {
   const { dispatch } = usePlanner();
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const totalHeight = HOURS.length * HOUR_HEIGHT;
 
   function handleGridClick(e: React.MouseEvent<HTMLDivElement>) {
     if (!date) return;
-    // Only create if clicking empty space (not on an event)
     if ((e.target as HTMLElement).closest("[data-event-block]")) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
@@ -51,14 +52,14 @@ export default function HourGrid({
     const hour = Math.floor(minutes / 60);
     const min = Math.round((minutes % 60) / 15) * 15;
     const startTime = `${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
-    const endHour = min + 60 >= 60 ? hour + 1 : hour;
-    const endMin = (min + 60) % 60;
-    const endTime = `${endHour.toString().padStart(2, "0")}:${endMin.toString().padStart(2, "0")}`;
+    const endHour = hour + 1;
+    const endTime = `${endHour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}`;
 
+    const newId = crypto.randomUUID();
     dispatch({
       type: "ADD_EVENT",
       payload: {
-        id: crypto.randomUUID(),
+        id: newId,
         type: "event",
         title: "New Event",
         date,
@@ -67,6 +68,7 @@ export default function HourGrid({
         category: "work",
       },
     });
+    setExpandedId(newId);
   }
 
   return (
@@ -87,7 +89,7 @@ export default function HourGrid({
           ))}
         </div>
 
-        {/* Events area — click empty space to create */}
+        {/* Events area */}
         <div
           className="relative flex-1 cursor-crosshair"
           style={{ height: totalHeight }}
@@ -106,7 +108,7 @@ export default function HourGrid({
           {HOURS.map((hour) => (
             <div
               key={`half-${hour}`}
-              className="absolute left-0 right-0 border-b border-dashed border-slate-50"
+              className="absolute left-0 right-0 border-b border-dashed border-slate-200"
               style={{
                 top: (hour - START_HOUR) * HOUR_HEIGHT + HOUR_HEIGHT / 2,
               }}
@@ -116,14 +118,25 @@ export default function HourGrid({
           {/* Event blocks */}
           {events.map((event) => {
             const { top, height } = getEventPosition(event);
+            const isExpanded = expandedId === event.id;
+
             return (
               <div
                 key={event.id}
                 data-event-block
                 className="absolute left-2 right-3"
-                style={{ top, height, minHeight: 32, zIndex: 10 }}
+                style={{
+                  top,
+                  height: isExpanded ? "auto" : height,
+                  minHeight: height,
+                  zIndex: isExpanded ? 50 : 10,
+                }}
               >
-                <EventBlock event={event} />
+                <EventBlock
+                  event={event}
+                  onClose={isExpanded ? () => setExpandedId(null) : undefined}
+                  onExpand={() => setExpandedId(event.id)}
+                />
               </div>
             );
           })}
