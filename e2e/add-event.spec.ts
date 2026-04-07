@@ -53,22 +53,19 @@ test("weekly inbox shows tasks grouped by priority", async ({ page }) => {
   await expect(page.getByText("Write blog post")).toBeVisible();
 });
 
-test("day view shows hourly grid and tasks section", async ({ page }) => {
+test("day view shows hourly grid with time labels", async ({ page }) => {
   const today = new Date().toISOString().split("T")[0];
   await page.goto(`/day/${today}`);
 
-  // Should show Schedule and Tasks sections
-  await expect(page.getByText("Schedule")).toBeVisible();
-
-  // Should show hourly time labels
-  await expect(page.getByText("9:30 AM")).toBeVisible();
+  // Should show hourly time labels and today button
+  await expect(page.getByText("Today")).toBeVisible();
+  await expect(page.getByText("9:00 AM")).toBeVisible();
 });
 
-test("week view shows calendar grid", async ({ page }) => {
+test("week view shows calendar grid with time labels", async ({ page }) => {
   await page.goto("/week");
 
-  await expect(page.getByRole("heading", { name: "Week" })).toBeVisible();
-
-  // Should show the time grid with hour labels
+  // Should show today button and hourly time labels
+  await expect(page.getByText("Today")).toBeVisible();
   await expect(page.getByText("9:00 AM")).toBeVisible();
 });

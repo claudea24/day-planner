@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePlanner } from "@/context/PlannerContext";
 import {
   getWeekDates,
@@ -8,21 +9,15 @@ import {
   getDayLabel,
   formatTime,
 } from "@/lib/utils";
+import EventBlock from "./EventBlock";
 
 const START_HOUR = 6;
 const END_HOUR = 22;
-const HOUR_HEIGHT = 48;
+const HOUR_HEIGHT = 60;
 const HOURS = Array.from(
   { length: END_HOUR - START_HOUR },
   (_, i) => START_HOUR + i
 );
-
-const categoryBorder: Record<string, string> = {
-  work: "border-l-blue-500 bg-blue-50 text-blue-800",
-  personal: "border-l-purple-500 bg-purple-50 text-purple-800",
-  health: "border-l-green-500 bg-green-50 text-green-800",
-  other: "border-l-gray-500 bg-gray-50 text-gray-800",
-};
 
 export default function WeekCalendar({
   weekStart,
@@ -35,10 +30,10 @@ export default function WeekCalendar({
   const totalHeight = HOURS.length * HOUR_HEIGHT;
 
   return (
-    <div className="flex flex-col rounded-lg border border-slate-200 bg-white">
+    <div className="flex h-full flex-col border-t border-slate-200 bg-white">
       {/* Sticky day headers */}
-      <div className="sticky top-0 z-20 flex border-b border-slate-200 bg-white">
-        <div className="w-14 flex-shrink-0 border-r border-slate-100" />
+      <div className="flex border-b border-slate-200 bg-white">
+        <div className="w-16 flex-shrink-0 border-r border-slate-100" />
         {weekDates.map((date) => {
           const isToday = date === today;
           const dayNum = new Date(date + "T00:00:00").getDate();
@@ -74,10 +69,9 @@ export default function WeekCalendar({
               {dayTasks.length > 0 && (
                 <div className="mt-1 flex flex-col gap-0.5 px-0.5">
                   {dayTasks.slice(0, 2).map((task) => (
-                    <Link
+                    <div
                       key={task.id}
-                      href={`/day/${date}`}
-                      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[10px] hover:opacity-80 ${
+                      className={`flex items-center gap-1 rounded px-1 py-0.5 text-[10px] ${
                         task.completed
                           ? "text-slate-400 line-through"
                           : "bg-red-50 text-red-700"
@@ -85,7 +79,7 @@ export default function WeekCalendar({
                     >
                       <div className="h-1 w-1 flex-shrink-0 rounded-full bg-red-500" />
                       <span className="truncate">{task.title}</span>
-                    </Link>
+                    </div>
                   ))}
                   {dayTasks.length > 2 && (
                     <span className="px-1 text-[10px] text-slate-400">
@@ -100,10 +94,10 @@ export default function WeekCalendar({
       </div>
 
       {/* Scrollable time grid */}
-      <div className="overflow-y-auto" style={{ maxHeight: "calc(100vh - 280px)" }}>
+      <div className="flex-1 overflow-y-auto">
         <div className="flex">
           {/* Time labels */}
-          <div className="w-14 flex-shrink-0 border-r border-slate-100">
+          <div className="w-16 flex-shrink-0 border-r border-slate-100">
             {HOURS.map((hour) => (
               <div
                 key={hour}
@@ -125,57 +119,124 @@ export default function WeekCalendar({
             const isToday = date === today;
 
             return (
-              <div
+              <DayColumn
                 key={date}
-                className={`relative flex-1 border-l border-slate-100 ${
-                  isToday ? "bg-blue-50/20" : ""
-                }`}
-                style={{ height: totalHeight }}
-              >
-                {/* Hour lines */}
-                {HOURS.map((hour) => (
-                  <div
-                    key={hour}
-                    className="absolute left-0 right-0 border-b border-slate-100"
-                    style={{
-                      top: (hour - START_HOUR) * HOUR_HEIGHT + HOUR_HEIGHT,
-                    }}
-                  />
-                ))}
-
-                {/* Events — clickable to day view */}
-                {dayEvents.map((event) => {
-                  const [startH, startM] = event.startTime
-                    .split(":")
-                    .map(Number);
-                  const [endH, endM] = event.endTime.split(":").map(Number);
-                  const startMin = startH * 60 + startM;
-                  const endMin = endH * 60 + endM;
-                  const gridStart = START_HOUR * 60;
-
-                  const top = ((startMin - gridStart) / 60) * HOUR_HEIGHT;
-                  const height = Math.max(
-                    ((endMin - startMin) / 60) * HOUR_HEIGHT,
-                    20
-                  );
-
-                  return (
-                    <Link
-                      key={event.id}
-                      href={`/day/${date}`}
-                      className={`absolute left-0.5 right-0.5 overflow-hidden truncate rounded border-l-2 px-1 py-0.5 text-[10px] font-medium transition-opacity hover:opacity-80 ${categoryBorder[event.category]}`}
-                      style={{ top, height, zIndex: 10 }}
-                      title={`${formatTime(event.startTime)} – ${formatTime(event.endTime)}: ${event.title}`}
-                    >
-                      {event.title}
-                    </Link>
-                  );
-                })}
-              </div>
+                date={date}
+                dayEvents={dayEvents}
+                isToday={isToday}
+                totalHeight={totalHeight}
+              />
             );
           })}
         </div>
       </div>
     </div>
+  );
+}
+
+function DayColumn({
+  date,
+  dayEvents,
+  isToday,
+  totalHeight,
+}: {
+  date: string;
+  dayEvents: ReturnType<typeof import("@/context/PlannerContext").usePlanner>["events"];
+  isToday: boolean;
+  totalHeight: number;
+}) {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  return (
+    <div
+      className={`relative flex-1 border-l border-slate-100 ${
+        isToday ? "bg-blue-50/20" : ""
+      }`}
+      style={{ height: totalHeight }}
+    >
+      {/* Hour lines */}
+      {HOURS.map((hour) => (
+        <div
+          key={hour}
+          className="absolute left-0 right-0 border-b border-slate-100"
+          style={{
+            top: (hour - START_HOUR) * HOUR_HEIGHT + HOUR_HEIGHT,
+          }}
+        />
+      ))}
+
+      {/* Events — clickable to expand inline */}
+      {dayEvents.map((event) => {
+        const [startH, startM] = event.startTime.split(":").map(Number);
+        const [endH, endM] = event.endTime.split(":").map(Number);
+        const startMin = startH * 60 + startM;
+        const endMin = endH * 60 + endM;
+        const gridStart = START_HOUR * 60;
+
+        const top = ((startMin - gridStart) / 60) * HOUR_HEIGHT;
+        const height = Math.max(
+          ((endMin - startMin) / 60) * HOUR_HEIGHT,
+          24
+        );
+        const isExpanded = expandedId === event.id;
+
+        return (
+          <div
+            key={event.id}
+            className="absolute left-0.5 right-0.5"
+            style={{
+              top,
+              height: isExpanded ? "auto" : height,
+              minHeight: height,
+              zIndex: isExpanded ? 30 : 10,
+            }}
+          >
+            {isExpanded ? (
+              <EventBlock
+                event={event}
+                onClose={() => setExpandedId(null)}
+              />
+            ) : (
+              <CompactEvent
+                event={event}
+                height={height}
+                onClick={() => setExpandedId(event.id)}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const categoryStyles: Record<string, string> = {
+  work: "border-l-blue-500 bg-blue-50 text-blue-800 hover:bg-blue-100",
+  personal: "border-l-purple-500 bg-purple-50 text-purple-800 hover:bg-purple-100",
+  health: "border-l-green-500 bg-green-50 text-green-800 hover:bg-green-100",
+  other: "border-l-gray-500 bg-gray-50 text-gray-800 hover:bg-gray-100",
+};
+
+function CompactEvent({
+  event,
+  height,
+  onClick,
+}: {
+  event: { id: string; title: string; startTime: string; category: string };
+  height: number;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`h-full w-full cursor-pointer overflow-hidden truncate rounded border-l-2 px-1.5 py-0.5 text-left text-[11px] font-medium transition-colors ${categoryStyles[event.category]}`}
+    >
+      {height > 30 && (
+        <span className="block text-[9px] font-normal opacity-70">
+          {formatTime(event.startTime)}
+        </span>
+      )}
+      {event.title}
+    </button>
   );
 }

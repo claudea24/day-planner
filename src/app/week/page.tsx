@@ -8,7 +8,6 @@ import {
   getAdjacentDate,
   formatDateShort,
   getPriorityColor,
-  getTodayString,
 } from "@/lib/utils";
 import WeekCalendar from "@/components/WeekCalendar";
 
@@ -36,10 +35,10 @@ export default function WeekPage() {
   }
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
+    <div className="flex h-[calc(100vh-49px)] flex-col">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-2">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-slate-900">Week</h1>
           <div className="flex items-center gap-1">
             <button
               onClick={prevWeek}
@@ -66,44 +65,35 @@ export default function WeekPage() {
               </svg>
             </button>
           </div>
-          <span className="text-sm text-slate-500">
+          <span className="text-sm font-medium text-slate-700">
             {formatDateShort(weekDates[0])} – {formatDateShort(weekDates[6])}
           </span>
         </div>
-        <Link
-          href="/add?tab=event"
-          className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          + Add Event
-        </Link>
+
+        <div className="flex items-center gap-2">
+          {unassignedP0.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-amber-700">
+                {unassignedP0.length} unassigned P0
+              </span>
+              <Link
+                href="/"
+                className="text-xs font-medium text-blue-600 hover:text-blue-700"
+              >
+                Assign
+              </Link>
+            </div>
+          )}
+          <Link
+            href="/add?tab=event"
+            className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
+            + Add Event
+          </Link>
+        </div>
       </div>
 
-      {unassignedP0.length > 0 && (
-        <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-amber-800">
-              Unassigned P0:
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              {unassignedP0.map((task) => (
-                <span
-                  key={task.id}
-                  className={`rounded-full border px-2 py-0.5 text-[10px] font-medium ${getPriorityColor("P0")}`}
-                >
-                  {task.title}
-                </span>
-              ))}
-            </div>
-            <Link
-              href="/"
-              className="ml-auto text-xs font-medium text-amber-700 underline"
-            >
-              Assign
-            </Link>
-          </div>
-        </div>
-      )}
-
+      {/* Full-height calendar */}
       <WeekCalendar weekStart={weekStart} />
     </div>
   );

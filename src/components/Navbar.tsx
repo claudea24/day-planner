@@ -2,31 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-const navLinks = [
-  { href: "/", label: "Inbox" },
-  { href: "/week", label: "Week" },
-];
+import { getTodayString } from "@/lib/utils";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const today = getTodayString();
+
+  const navLinks = [
+    { href: "/", label: "Inbox" },
+    { href: `/day/${today}`, label: "Day", match: "/day" },
+    { href: "/week", label: "Week" },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-sm">
-      <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+      <div className="flex items-center justify-between px-4 py-2">
         <Link href="/" className="text-lg font-bold text-slate-900">
           Day Planner
         </Link>
 
         <div className="flex items-center gap-1">
           {navLinks.map((link) => {
-            const isActive =
-              link.href === "/"
+            const isActive = link.match
+              ? pathname.startsWith(link.match)
+              : link.href === "/"
                 ? pathname === "/"
                 : pathname.startsWith(link.href);
             return (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                   isActive

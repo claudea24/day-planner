@@ -8,7 +8,7 @@ export default function Home() {
   const { P0, P1, P2 } = useTasksByPriority();
 
   return (
-    <div>
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="mb-8 flex items-end justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Weekly Inbox</h1>

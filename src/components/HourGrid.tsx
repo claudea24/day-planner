@@ -39,7 +39,7 @@ export default function HourGrid({
   const totalHeight = HOURS.length * HOUR_HEIGHT;
 
   return (
-    <div className="overflow-y-auto rounded-lg border border-slate-200 bg-white" style={{ maxHeight: "calc(100vh - 320px)" }}>
+    <div className="h-full overflow-y-auto bg-white">
       <div className="flex">
         {/* Time labels column */}
         <div className="sticky left-0 w-16 flex-shrink-0 border-r border-slate-100 bg-white">
