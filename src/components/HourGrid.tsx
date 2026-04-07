@@ -75,11 +75,11 @@ export default function HourGrid({
     <div className="h-full overflow-y-auto bg-white">
       <div className="flex">
         {/* Time labels column */}
-        <div className="sticky left-0 w-16 flex-shrink-0 border-r border-slate-100 bg-white">
+        <div className="sticky left-0 w-20 flex-shrink-0 border-r border-slate-100 bg-white">
           {HOURS.map((hour) => (
             <div
               key={hour}
-              className="flex items-start justify-end border-b border-slate-200 pr-2 pt-1"
+              className="flex items-start justify-end border-b border-slate-200 pr-3 pt-1"
               style={{ height: HOUR_HEIGHT }}
             >
               <span className="text-sm text-slate-500">
