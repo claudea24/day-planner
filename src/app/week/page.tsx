@@ -85,10 +85,10 @@ export default function WeekPage() {
             </div>
           )}
           <Link
-            href="/add?tab=event"
+            href="/add"
             className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-blue-700"
           >
-            + Add Event
+            + Add Item
           </Link>
         </div>
       </div>
