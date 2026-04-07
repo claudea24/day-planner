@@ -32,7 +32,8 @@ export default function EventBlock({
   const [expanded, setExpanded] = useState(onClose ? true : false);
   const [editingNotes, setEditingNotes] = useState(false);
   const [notes, setNotes] = useState(event.notes || "");
-  const [summarizing, setSummarizing] = useState(false);
+  const [polishing, setPolishing] = useState(false);
+  const [polishedNotes, setPolishedNotes] = useState<string | null>(null);
 
   // Inline editable fields
   const [editingTime, setEditingTime] = useState(false);
@@ -43,27 +44,40 @@ export default function EventBlock({
   const [editingTitle, setEditingTitle] = useState(false);
   const [title, setTitle] = useState(event.title);
 
-  async function handleSummarize() {
-    if (!event.notes) return;
-    setSummarizing(true);
+  async function handlePolish() {
+    const text = notes.trim() || event.notes;
+    if (!text) return;
+    setPolishing(true);
+    setPolishedNotes(null);
     try {
       const res = await fetch("/api/summarize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: event.notes }),
+        body: JSON.stringify({ text }),
       });
       if (res.ok) {
-        const { summary } = await res.json();
-        dispatch({
-          type: "UPDATE_EVENT",
-          payload: { id: event.id, notesSummary: summary },
-        });
+        const { polished } = await res.json();
+        setPolishedNotes(polished);
       }
     } catch {
       // silently fail
     } finally {
-      setSummarizing(false);
+      setPolishing(false);
     }
+  }
+
+  function acceptPolished() {
+    if (!polishedNotes) return;
+    setNotes(polishedNotes);
+    dispatch({
+      type: "UPDATE_EVENT",
+      payload: { id: event.id, notes: polishedNotes },
+    });
+    setPolishedNotes(null);
+  }
+
+  function rejectPolished() {
+    setPolishedNotes(null);
   }
 
   function saveNotes() {
@@ -287,10 +301,41 @@ export default function EventBlock({
                   className="w-full rounded border border-slate-200 px-2 py-1 text-sm text-slate-700 focus:border-blue-400 focus:outline-none"
                   placeholder="Add notes..."
                 />
-                <div className="mt-1 flex gap-1">
+                <div className="mt-1 flex items-center gap-1">
                   <button onClick={saveNotes} className="rounded bg-blue-600 px-2 py-0.5 text-xs text-white hover:bg-blue-700">Save</button>
-                  <button onClick={() => { setNotes(event.notes || ""); setEditingNotes(false); }} className="rounded px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-100">Cancel</button>
+                  <button onClick={() => { setNotes(event.notes || ""); setEditingNotes(false); setPolishedNotes(null); }} className="rounded px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-100">Cancel</button>
+                  {notes.trim() && (
+                    <button
+                      onClick={handlePolish}
+                      disabled={polishing}
+                      className="ml-auto rounded bg-violet-100 px-2 py-0.5 text-xs font-medium text-violet-700 hover:bg-violet-200 disabled:opacity-50"
+                    >
+                      {polishing ? "Polishing..." : "Polish with AI"}
+                    </button>
+                  )}
                 </div>
+
+                {/* Polished preview */}
+                {polishedNotes && (
+                  <div className="mt-2 rounded border border-violet-200 bg-violet-50 p-2">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-500">AI-polished version</p>
+                    <p className="mt-1 whitespace-pre-wrap text-xs text-slate-700">{polishedNotes}</p>
+                    <div className="mt-2 flex gap-1">
+                      <button
+                        onClick={acceptPolished}
+                        className="rounded bg-violet-600 px-2 py-0.5 text-xs text-white hover:bg-violet-700"
+                      >
+                        Replace with polished
+                      </button>
+                      <button
+                        onClick={rejectPolished}
+                        className="rounded px-2 py-0.5 text-xs text-slate-500 hover:bg-slate-100"
+                      >
+                        Keep original
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div>
@@ -305,23 +350,6 @@ export default function EventBlock({
               </div>
             )}
           </div>
-
-          {event.notesSummary && (
-            <div className="rounded-md bg-white/60 p-2">
-              <p className="text-xs font-medium text-slate-500">AI Summary</p>
-              <p className="mt-0.5 text-xs text-slate-700">{event.notesSummary}</p>
-            </div>
-          )}
-
-          {event.notes && (
-            <button
-              onClick={handleSummarize}
-              disabled={summarizing}
-              className="rounded bg-slate-200 px-2 py-1 text-xs font-medium text-slate-700 hover:bg-slate-300 disabled:opacity-50"
-            >
-              {summarizing ? "Summarizing..." : event.notesSummary ? "Re-summarize" : "Summarize with AI"}
-            </button>
-          )}
         </div>
       )}
     </div>

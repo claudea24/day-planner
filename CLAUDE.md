@@ -44,7 +44,7 @@ Things that happen at a specific time — meetings, calls, appointments. Each ha
 - **React Context + useReducer** for client-side state (in-memory)
 - **HTML5 Drag and Drop** for task reordering between priorities
 - **Playwright** for end-to-end testing
-- **Claude API** (Haiku) for AI-powered note summarization
+- **Claude API** (Haiku) for AI-powered note polishing
 
 ## Getting Started
 
@@ -90,7 +90,6 @@ interface ScheduleEvent {
   category: "work" | "personal" | "health" | "other";
   location?: string;
   notes?: string;
-  notesSummary?: string;     // AI-generated summary
 }
 
 type PlannerItem = Task | ScheduleEvent;
@@ -102,7 +101,7 @@ type PlannerItem = Task | ScheduleEvent;
 - `DELETE_TASK` — remove a task
 - `COPY_TASKS_FROM_WEEK` — copy incomplete tasks from one week to another
 - `ADD_EVENT` — create a new scheduled event
-- `UPDATE_EVENT` — edit event title, time, location, notes, or AI summary
+- `UPDATE_EVENT` — edit event title, time, location, or notes
 - `DELETE_EVENT` — remove a scheduled event
 
 State is managed via React Context + useReducer. Data lives in memory — refreshing resets to seed data.
@@ -137,8 +136,10 @@ State is managed via React Context + useReducer. Data lives in memory — refres
 - Task form: title, priority selector (P0/P1/P2), category, optional day, description
 - Event form: title, date, start/end time, location, category, notes
 
-### AI Summarize
-- On any event with notes, click **"Summarize with AI"** to generate a concise summary via Claude API
+### Polish with AI
+- While editing notes, click **"Polish with AI"** to get a cleaned-up version
+- AI improves grammar, clarity, and organization while keeping the same meaning
+- A preview appears with **"Replace with polished"** or **"Keep original"** buttons
 - Uses `/api/summarize` endpoint calling Claude Haiku
 
 ## Shared Layout

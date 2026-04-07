@@ -27,11 +27,11 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 200,
+        max_tokens: 500,
         messages: [
           {
             role: "user",
-            content: `Summarize these meeting/event notes in 1-2 concise sentences:\n\n${text}`,
+            content: `Polish and improve the following notes. Fix grammar, improve clarity, and make them more professional and well-organized. Keep the same meaning and details, just make them read better. Return only the polished text, nothing else.\n\n${text}`,
           },
         ],
       }),
@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    const summary = data.content[0]?.text || "Could not generate summary";
+    const polished = data.content[0]?.text || "Could not polish notes";
 
-    return NextResponse.json({ summary });
+    return NextResponse.json({ polished });
   } catch {
     return NextResponse.json(
       { error: "Failed to call AI API" },

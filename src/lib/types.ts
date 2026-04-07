@@ -22,7 +22,6 @@ export interface ScheduleEvent {
   category: "work" | "personal" | "health" | "other";
   location?: string;
   notes?: string;
-  notesSummary?: string; // AI-generated summary
 }
 
 export type PlannerItem = Task | ScheduleEvent;
